@@ -20,7 +20,7 @@ var Stack = function() {
   return obj;
 }
 
-var stacky = new Stack();
+var stacky = Stack();
 stacky.push("hello");
 stacky.push("charlie");
 stacky.push("harrington");
