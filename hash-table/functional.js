@@ -1,11 +1,17 @@
 var HashTable = function() {
 
+  // Double in size when utilization is greater than 75%
+  // Halve in size when below 25%
+
   var obj = {};
   var storage = [];
-  var storageLimit = 8;
+  var storageLimit = 16;
+  var size = 0;
 
   // Average: O(1), worst: O(n)
   obj.insert = function(key, val) {
+
+    console.log("inserting: ", key, val);
 
     var index = getIndexBelowMaxForKey(key, storageLimit);
     var bucket = storage[index] || [];
@@ -21,9 +27,14 @@ var HashTable = function() {
     if (!foundIt) {
       var tuple = [key, val];
       bucket.push(tuple);
+      size++;
     }
 
     storage[index] = bucket;
+
+    if ( size >= storageLimit * 0.75 ) {
+      resize(storageLimit * 2);
+    }
 
   };
 
@@ -52,12 +63,46 @@ var HashTable = function() {
       if (bucket[i][0] === key) {
         result = bucket[i][1];
         bucket[i][1] = undefined;
+        size--;
       }
     }
 
     storage[index] = bucket;
+
+    if (size <= storageLimit * 0.25) {
+      resize(storageLimit / 2);
+    }
+
     return result;
 
+  };
+
+  // Resizing means that insertion or deletion
+  // could be O(n)
+  var resizing = false;
+  var resize = function(newLimit) {
+    console.log("Resizing to new limit of ", newLimit );
+    if (!resizing) {
+      var tuples = [];
+      for (var i = 0; i < storage.length; i++ ) {
+        if (!storage[i]) {
+          continue;
+        }
+        for (var j = 0; j < storage[i].length; j++ ) {
+          if (!storage[i][j]) {
+            continue;
+          }
+          tuples.push(storage[i][j]);
+        }
+      }
+      storageLimit = newLimit;
+      storage = [];
+      size = 0;
+      for (var i = 0; i < tuples.length; i++ ) {
+        obj.insert(tuples[i][0], tuples[i][1]);
+      }
+      resizing = false;
+    }
   };
 
   return obj;
@@ -87,5 +132,13 @@ console.log(hashy.remove("Darth"));
 console.log(hashy.retrieve("Darth"));
 hashy.insert("Darth", "Vader");
 console.log(hashy.retrieve("Darth"));
+hashy.insert("Luke", "Sky");
+hashy.insert("Han", "Solo");
+hashy.insert("Leia", "Solo");
+hashy.insert("Greedo", "Thing");
+hashy.insert("Boba", "Fett");
+hashy.insert("Lando", "Cal");
+hashy.insert("Poe", "D");
+console.log(hashy);
 
 
