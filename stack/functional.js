@@ -1,15 +1,19 @@
 var Stack = function() {
 
+  //LIFO
+
   var obj = {};
 
   obj.storage = {};
   obj.length = 0;
 
+  //O(1)
   obj.push = function(val) {
     obj.storage[obj.length] = val;
     obj.length++;
   }
 
+  //O(1)
   obj.pop = function() {
     var result = obj.storage[obj.length - 1];
     delete obj.storage[obj.length - 1];
